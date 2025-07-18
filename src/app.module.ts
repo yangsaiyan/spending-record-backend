@@ -13,7 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       type: 'postgres',
       url: process.env.DATABASE_URL,
       autoLoadEntities: true,
-      synchronize: true, // remove after development !!!!!!!!!!!!!!
+      synchronize: false,
       ssl: {
         rejectUnauthorized: false,
       },
