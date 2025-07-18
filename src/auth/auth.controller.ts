@@ -17,8 +17,8 @@ export class AuthController {
     );
     res.cookie('jwt', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 60 * 60 * 1000,
     });
     return { message: 'User registered' };
@@ -35,8 +35,8 @@ export class AuthController {
     );
     res.cookie('jwt', access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      secure: true,
+      sameSite: 'none',
       maxAge: 60 * 60 * 1000,
     });
     return { message: 'Logged in' };
