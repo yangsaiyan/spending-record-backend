@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { LessThanOrEqual, Like, Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
@@ -7,7 +8,10 @@ import { User } from 'src/user/user.entity';
 
 @Injectable()
 export class RecordService {
-  constructor(private readonly recordRepository: Repository<Record>) {}
+  constructor(
+    @InjectRepository(Record)
+    private readonly recordRepository: Repository<Record>,
+  ) {}
 
   async createRecord(createRecordDto: CreateRecordDto, user: User) {
     const record = this.recordRepository.create({
