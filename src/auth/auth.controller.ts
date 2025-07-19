@@ -6,6 +6,7 @@ import { AuthService } from './auth.service';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // API(/auth/register)
   @Post('register')
   async register(
     @Body() body: { email: string; password: string },
@@ -24,6 +25,7 @@ export class AuthController {
     return { message: 'User registered' };
   }
 
+  // API(/auth/login)
   @Post('login')
   async login(
     @Body() body: { email: string; password: string },
@@ -42,6 +44,7 @@ export class AuthController {
     return { message: 'Logged in' };
   }
 
+  // API(/auth/logout)
   @Post('logout')
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('jwt');
