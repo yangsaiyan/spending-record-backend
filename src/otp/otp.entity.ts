@@ -4,12 +4,18 @@ import {
   DeleteDateColumn,
   Entity,
   OneToOne,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity()
 export class Otp {
+  @PrimaryGeneratedColumn('uuid')
+  otpId: string;
+
   @OneToOne(() => User, (user) => user.otp)
+  @JoinColumn()
   user: User;
 
   @Column()
