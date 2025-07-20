@@ -17,7 +17,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { User } from 'src/user/user.entity';
 import { UpdateRecordDto } from './dto/update-record.dto';
 
-@UseGuards(AuthGuard)
+// @UseGuards(AuthGuard)
 @Controller('record')
 export class RecordController {
   constructor(private readonly recordService: RecordService) {}
