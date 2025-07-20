@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
+import { Record } from '../record/record.entity';
 
 @Entity({ name: 'Users' })
 export class User {
@@ -22,4 +24,7 @@ export class User {
 
   @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
+
+  @OneToMany(() => Record, (record) => record.user)
+  records: Record[];
 }

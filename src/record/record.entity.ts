@@ -13,7 +13,7 @@ export class Record {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => User, (user) => user.records)
   user: User;
 
   @Column()
