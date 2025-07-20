@@ -1,6 +1,7 @@
-import { Controller, Post, Body, Res } from '@nestjs/common';
+import { Controller, Post, Body, Res, Query } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { AuthUserDto } from './dto/auth-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -9,13 +10,10 @@ export class AuthController {
   // API(/auth/register)
   @Post('register')
   async register(
-    @Body() body: { email: string; password: string },
+    @Body() body: AuthUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { access_token } = await this.authService.register(
-      body.email,
-      body.password,
-    );
+    const { access_token } = await this.authService.register(body);
     res.cookie('jwt', access_token, {
       httpOnly: true,
       secure: true,
@@ -28,13 +26,10 @@ export class AuthController {
   // API(/auth/login)
   @Post('login')
   async login(
-    @Body() body: { email: string; password: string },
+    @Body() body: AuthUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { access_token } = await this.authService.login(
-      body.email,
-      body.password,
-    );
+    const { access_token } = await this.authService.login(body);
     res.cookie('jwt', access_token, {
       httpOnly: true,
       secure: true,
@@ -49,5 +44,19 @@ export class AuthController {
   logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('jwt');
     return { message: 'Logged out' };
+  }
+
+  // API(/auth/send-otp)
+  @Post('send-otp')
+  async sendOtp(@Body() body: AuthUserDto) {
+    await this.authService.sendOTPEmail(body.email);
+    return { message: 'OTP sent successfully' };
+  }
+
+  // API(/auth/reset)
+  @Post('reset')
+  async reset(@Body() body: AuthUserDto, @Query('otp') otp: string) {
+    await this.authService.resetPassword(body, otp);
+    return { message: 'Password reset successfully' };
   }
 }

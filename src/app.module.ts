@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RecordModule } from './record/record.module';
+import { OtpModule } from './otp/otp.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RecordModule } from './record/record.module';
         rejectUnauthorized: false,
       },
     }),
+    OtpModule,
   ],
   controllers: [AppController],
   providers: [AppService],

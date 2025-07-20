@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { Record } from '../record/record.entity';
+import { Otp } from 'src/otp/otp.entity';
 
 @Entity({ name: 'Users' })
 export class User {
@@ -27,4 +29,7 @@ export class User {
 
   @OneToMany(() => Record, (record) => record.user)
   records: Record[];
+
+  @OneToOne(() => Otp, (otp) => otp.user)
+  otp: Otp;
 }
