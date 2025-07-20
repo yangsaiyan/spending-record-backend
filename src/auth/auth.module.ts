@@ -5,11 +5,13 @@ import { UserModule } from 'src/user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
 import { PassportModule } from '@nestjs/passport';
+import { OtpModule } from 'src/otp/otp.module';
 
 @Module({
   imports: [
     UserModule,
     PassportModule,
+    OtpModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'topSecretKey',
       signOptions: { expiresIn: '60s' },
