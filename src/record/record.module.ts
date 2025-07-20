@@ -8,5 +8,6 @@ import { Record } from './record.entity';
   imports: [TypeOrmModule.forFeature([Record])],
   controllers: [RecordController],
   providers: [RecordService],
+  exports: [RecordService],
 })
 export class RecordModule {}

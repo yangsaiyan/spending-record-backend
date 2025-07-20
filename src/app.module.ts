@@ -11,6 +11,7 @@ import { RecordModule } from './record/record.module';
   imports: [
     AuthModule,
     UserModule,
+    RecordModule,
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -23,7 +24,6 @@ import { RecordModule } from './record/record.module';
         rejectUnauthorized: false,
       },
     }),
-    RecordModule,
   ],
   controllers: [AppController],
   providers: [AppService],
