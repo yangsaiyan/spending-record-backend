@@ -40,7 +40,10 @@ export class OtpService {
   async verifyOtp(user: User, otp: string) {
     const existingOtp = await this.otpRepository.findOne({
       where: { user: { id: user.id } },
+      relations: ['user'],
+      withDeleted: true,
     });
+    console.log(user);
     console.log(existingOtp);
     console.log(otp);
     console.log(Number(existingOtp?.otp));
