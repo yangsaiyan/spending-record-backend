@@ -39,7 +39,7 @@ export class OtpService {
 
   async verifyOtp(user: User, otp: string) {
     const existingOtp = await this.otpRepository.findOne({
-      where: { user: { id: user.id }, otp },
+      where: { user: { id: user.id } },
     });
     console.log(existingOtp);
     console.log(otp);
