@@ -19,15 +19,6 @@ export class OtpService {
       withDeleted: true,
     });
 
-    if (!existingOtp) {
-      const newOtp = this.otpRepository.create({
-        user,
-        otp: generateOTP(),
-      });
-      await this.otpRepository.save(newOtp);
-      return { message: 'OTP created successfully', otp: newOtp.otp };
-    }
-
     const newOtpValue = generateOTP();
 
     if (existingOtp) {
@@ -47,20 +38,20 @@ export class OtpService {
   }
 
   async verifyOtp(user: User, otp: string) {
-    const otpEntity = await this.otpRepository.findOne({
+    const existingOtp = await this.otpRepository.findOne({
       where: { user: { id: user.id }, otp },
     });
-    if (!otpEntity || otpEntity.otp !== otp) {
+    if (!existingOtp || existingOtp.otp !== otp) {
       return { message: 'Invalid OTP' };
     }
 
-    if (otpEntity.triggeredAt < new Date(Date.now() - 10 * 60 * 1000)) {
-      await this.otpRepository.softDelete(otpEntity.otpId);
+    if (existingOtp.triggeredAt < new Date(Date.now() - 10 * 60 * 1000)) {
+      await this.otpRepository.softDelete(existingOtp.otpId);
       return { message: 'OTP expired' };
     }
 
-    await this.otpRepository.softDelete(otpEntity.otp);
-    await this.otpRepository.update(otpEntity.user.id, {
+    await this.otpRepository.softDelete(existingOtp.otp);
+    await this.otpRepository.update(existingOtp.user.id, {
       deletedAt: new Date(),
     });
     return { message: 'OTP verified successfully' };
