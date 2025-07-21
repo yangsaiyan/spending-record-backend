@@ -16,7 +16,6 @@ export class OtpService {
     const existingOtp = await this.otpRepository.findOne({
       where: { user: { id: user.id } },
       relations: ['user'],
-      withDeleted: false,
     });
 
     const newOtpValue = generateOTP();
@@ -50,7 +49,7 @@ export class OtpService {
       return { message: 'OTP expired' };
     }
 
-    await this.otpRepository.softDelete(otpEntity.otpId);
+    await this.otpRepository.softDelete(otpEntity.otp);
     await this.otpRepository.update(otpEntity.user.id, {
       deletedAt: new Date(),
     });
