@@ -76,25 +76,21 @@ export class AuthService {
     throw new UnauthorizedException('Failed to send OTP');
   }
 
-  async resetPassword(authUserDto: AuthUserDto, otp: string) {
-    // Check if email and password are provided
-    if (!authUserDto.email) {
-      throw new UnauthorizedException('Invalid email');
-    }
+  async resetPassword(email: string, otp: string) {
     // Check if user exists
-    const user = await this.userService.findByEmail(authUserDto.email);
-    if (!user) {
+    const thisUser = await this.userService.findByEmail(email);
+    if (!thisUser) {
       throw new UnauthorizedException('User not found');
     }
-    const otpVerification = await this.otpService.verifyOtp(user, otp);
+    const otpVerification = await this.otpService.verifyOtp(thisUser, otp);
     if (otpVerification.message !== 'OTP verified successfully') {
       throw new UnauthorizedException(otpVerification.message);
     }
     const password = generateRandomPassword();
     const hashed = await bcrypt.hash(password, 10);
-    await this.userService.updateUser(user.id, { password: hashed });
+    await this.userService.updateUser(thisUser.id, { password: hashed });
     sendEmail(
-      authUserDto.email,
+      thisUser.email,
       'Reset Password',
       `Your new password is <b>${password}</b>`,
     );
