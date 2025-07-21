@@ -41,8 +41,8 @@ export class OtpService {
     const existingOtp = await this.otpRepository.findOne({
       where: { user: { id: user.id }, otp },
     });
-    
-    if (!existingOtp || existingOtp.otp !== otp) {
+
+    if (!existingOtp || Number(existingOtp.otp) !== Number(otp)) {
       return { message: 'Invalid OTP' };
     }
 
