@@ -43,13 +43,8 @@ export class OtpService {
       relations: ['user'],
       withDeleted: true,
     });
-    console.log(user);
-    console.log(existingOtp);
-    console.log(otp);
-    console.log(Number(existingOtp?.otp));
-    console.log(Number(otp));
-    console.log(Number(existingOtp?.otp) !== Number(otp));
-    if (!existingOtp || Number(existingOtp.otp) !== Number(otp)) {
+    
+    if (!existingOtp || existingOtp.otp === "" || Number(existingOtp.otp) !== Number(otp)) {
       return { message: 'Invalid OTP' };
     }
 
@@ -58,8 +53,8 @@ export class OtpService {
       return { message: 'OTP expired' };
     }
 
-    await this.otpRepository.softDelete(existingOtp.otp);
-    await this.otpRepository.update(existingOtp.user.id, {
+    await this.otpRepository.update(existingOtp.otpId, {
+      otp: "",
       deletedAt: new Date(),
     });
     return { message: 'OTP verified successfully' };
