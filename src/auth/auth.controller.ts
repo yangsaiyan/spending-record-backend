@@ -55,8 +55,8 @@ export class AuthController {
 
   // API(/auth/reset-password)
   @Post('reset-password')
-  async reset(@Query('email') email: string, @Query('otp') otp: string) {
-    await this.authService.resetPassword(email, otp);
+  async reset(@Body() body: { email: string; otp: string }) {
+    await this.authService.resetPassword(body.email, body.otp);
     return { message: 'Password reset successfully' };
   }
 }
