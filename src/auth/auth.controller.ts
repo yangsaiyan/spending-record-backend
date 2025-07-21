@@ -46,15 +46,15 @@ export class AuthController {
     return { message: 'Logged out' };
   }
 
-  // API(/auth/send-otp)
-  @Post('send-otp')
+  // API(/auth/forgot-password)
+  @Post('forgot-password')
   async sendOtp(@Body() body: AuthUserDto) {
     await this.authService.sendOTPEmail(body.email);
     return { message: 'OTP sent successfully' };
   }
 
-  // API(/auth/reset)
-  @Post('reset')
+  // API(/auth/reset-password)
+  @Post('reset-password')
   async reset(@Body() body: AuthUserDto, @Query('otp') otp: string) {
     await this.authService.resetPassword(body, otp);
     return { message: 'Password reset successfully' };
