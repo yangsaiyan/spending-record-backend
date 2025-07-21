@@ -16,7 +16,17 @@ export class OtpService {
     const existingOtp = await this.otpRepository.findOne({
       where: { user: { id: user.id } },
       relations: ['user'],
+      withDeleted: true,
     });
+
+    if (!existingOtp) {
+      const newOtp = this.otpRepository.create({
+        user,
+        otp: generateOTP(),
+      });
+      await this.otpRepository.save(newOtp);
+      return { message: 'OTP created successfully', otp: newOtp.otp };
+    }
 
     const newOtpValue = generateOTP();
 

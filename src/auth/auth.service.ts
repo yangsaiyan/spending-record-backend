@@ -62,7 +62,10 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
     const otpCreation = await this.otpService.createOtp(user);
-    if (otpCreation.message === 'OTP created successfully') {
+    if (
+      otpCreation.message === 'OTP created successfully' ||
+      otpCreation.message === 'OTP updated successfully'
+    ) {
       sendEmail(
         email,
         'OTP for password reset',
