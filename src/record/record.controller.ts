@@ -37,10 +37,11 @@ export class RecordController {
   // API(/record/paginated)
   @Get('paginated')
   async getPaginated(
-    @Query('page', new ParseIntPipe()) page = 1,
-    @Query('limit', new ParseIntPipe()) limit = 10,
+    @Query('page', ParseIntPipe) page = 1,
+    @Query('limit', ParseIntPipe) limit = 10,
     @Request() req,
   ) {
+    console.log(page, limit);
     return this.recordService.findAllRecordsPaginated(page, limit, req);
   }
 
