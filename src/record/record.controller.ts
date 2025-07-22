@@ -10,6 +10,7 @@ import {
   BadRequestException,
   Put,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { RecordService } from './record.service';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -36,17 +37,11 @@ export class RecordController {
   // API(/record/paginated)
   @Get('paginated')
   async getPaginated(
-    @Query('page') page: string,
-    @Query('limit') limit: string,
+    @Query('page', new ParseIntPipe()) page = 1,
+    @Query('limit', new ParseIntPipe()) limit = 10,
     @Request() req,
   ) {
-    const pageNum = Number(page) || 1;
-    const limitNum = Number(limit) || 10;
-    return this.recordService.findAllRecordsPaginated(
-      pageNum,
-      limitNum,
-      req.user.email,
-    );
+    return this.recordService.findAllRecordsPaginated(page, limit, req);
   }
 
   // API(/record/getDaysRecords/:days)
