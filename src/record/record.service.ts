@@ -27,11 +27,19 @@ export class RecordService {
     return this.recordRepository.save(record);
   }
 
-  async findAllRecords(user: User) {
+  async findAllRecords(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return this.recordRepository.find({ where: { user: user } });
   }
 
-  async findAllRecordsPaginated(page: number, limit: number, user: User) {
+  async findAllRecordsPaginated(page: number, limit: number, email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const [records, total] = await this.recordRepository.findAndCount({
       where: { user: user },
       skip: (page - 1) * limit,
@@ -42,7 +50,11 @@ export class RecordService {
     return { records, total, totalPages };
   }
 
-  async findLast7DaysRecords(user: User) {
+  async findLast7DaysRecords(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     return this.recordRepository.find({
@@ -50,7 +62,11 @@ export class RecordService {
     });
   }
 
-  async findLast30DaysRecords(user: User) {
+  async findLast30DaysRecords(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     return this.recordRepository.find({
@@ -58,7 +74,11 @@ export class RecordService {
     });
   }
 
-  async findLast90DaysRecords(user: User) {
+  async findLast90DaysRecords(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     return this.recordRepository.find({
@@ -66,7 +86,11 @@ export class RecordService {
     });
   }
 
-  async findLast180DaysRecords(user: User) {
+  async findLast180DaysRecords(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const oneHundredEightyDaysAgo = new Date();
     oneHundredEightyDaysAgo.setDate(oneHundredEightyDaysAgo.getDate() - 180);
     return this.recordRepository.find({
@@ -74,7 +98,11 @@ export class RecordService {
     });
   }
 
-  async findLast365DaysRecords(user: User) {
+  async findLast365DaysRecords(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const threeHundredSixtyFiveDaysAgo = new Date();
     threeHundredSixtyFiveDaysAgo.setDate(
       threeHundredSixtyFiveDaysAgo.getDate() - 365,
@@ -87,7 +115,11 @@ export class RecordService {
     });
   }
 
-  async findAllLast7DaysCategoriesTotal(user: User) {
+  async findAllLast7DaysCategoriesTotal(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const categories = await this.recordRepository.find({
@@ -100,7 +132,11 @@ export class RecordService {
     return categoriesTotal;
   }
 
-  async findAllLast30DaysCategoriesTotal(user: User) {
+  async findAllLast30DaysCategoriesTotal(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const categories = await this.recordRepository.find({
@@ -113,7 +149,11 @@ export class RecordService {
     return categoriesTotal;
   }
 
-  async findAllLast90DaysCategoriesTotal(user: User) {
+  async findAllLast90DaysCategoriesTotal(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     const categories = await this.recordRepository.find({
@@ -126,7 +166,11 @@ export class RecordService {
     return categoriesTotal;
   }
 
-  async findAllLast180DaysCategoriesTotal(user: User) {
+  async findAllLast180DaysCategoriesTotal(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const oneHundredEightyDaysAgo = new Date();
     oneHundredEightyDaysAgo.setDate(oneHundredEightyDaysAgo.getDate() - 180);
     const categories = await this.recordRepository.find({
@@ -139,7 +183,11 @@ export class RecordService {
     return categoriesTotal;
   }
 
-  async findAllLast365DaysCategoriesTotal(user: User) {
+  async findAllLast365DaysCategoriesTotal(email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const threeHundredSixtyFiveDaysAgo = new Date();
     threeHundredSixtyFiveDaysAgo.setDate(
       threeHundredSixtyFiveDaysAgo.getDate() - 365,
@@ -157,17 +205,29 @@ export class RecordService {
     return categoriesTotal;
   }
 
-  async findRecordByDescription(description: string, user: User) {
+  async findRecordByDescription(description: string, email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return this.recordRepository.findOne({
       where: { description: Like(`%${description}%`), user: user },
     });
   }
 
-  async updateRecord(updateRecordDto: UpdateRecordDto, id: string, user: User) {
+  async updateRecord(updateRecordDto: UpdateRecordDto, id: string, email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return this.recordRepository.update({ id, user: user }, updateRecordDto);
   }
 
-  async deleteRecord(id: string, user: User) {
+  async deleteRecord(id: string, email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return this.recordRepository.delete({ id, user: user });
   }
 }
