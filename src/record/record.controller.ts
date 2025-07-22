@@ -41,8 +41,8 @@ export class RecordController {
     @Query('limit', ParseIntPipe) limit = 10,
     @Request() req,
   ) {
-    console.log(page, limit);
-    return this.recordService.findAllRecordsPaginated(page, limit, req);
+    console.log(page, limit, req.user.email);
+    return this.recordService.findAllRecordsPaginated(page, limit, req.user.email);
   }
 
   // API(/record/getDaysRecords/:days)
