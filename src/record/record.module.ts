@@ -6,7 +6,7 @@ import { Record } from './record.entity';
 import { User } from 'src/user/user.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Record, Userg])],
+  imports: [TypeOrmModule.forFeature([Record, User])],
   controllers: [RecordController],
   providers: [RecordService],
   exports: [RecordService],
