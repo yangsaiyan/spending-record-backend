@@ -22,14 +22,14 @@ import { UpdateRecordDto } from './dto/update-record.dto';
 export class RecordController {
   constructor(private readonly recordService: RecordService) {}
 
-  // API(/record)
-  @Post()
+  // API(/record/create)
+  @Post('create')
   createRecord(@Body() createRecordDto: CreateRecordDto, @Request() req) {
     return this.recordService.createRecord(createRecordDto, req.user as User);
   }
 
-  // API(/record)
-  @Get()
+  // API(/record/all)
+  @Get('all')
   findAllRecords(@Request() req) {
     return this.recordService.findAllRecords(req.user as User);
   }
@@ -109,7 +109,7 @@ export class RecordController {
   }
 
   // API(/record/:id)
-  @Put(':id')
+  @Put('update/:id')
   updateRecord(
     @Body() updateRecordDto: UpdateRecordDto,
     @Param('id') id: string,
@@ -123,7 +123,7 @@ export class RecordController {
   }
 
   // API(/record/:id)
-  @Delete(':id')
+  @Delete('delete/:id')
   deleteRecord(@Param('id') id: string, @Request() req) {
     return this.recordService.deleteRecord(id, req.user as User);
   }

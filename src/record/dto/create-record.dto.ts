@@ -4,7 +4,7 @@ export class CreateRecordDto {
   @IsNumber()
   amount: number;
 
-  @IsString()
+  @IsNumber()
   category: number;
 
   @IsOptional()
