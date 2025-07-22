@@ -42,7 +42,7 @@ export class RecordService {
     }
     const [records, total] = await this.recordRepository.findAndCount({
       where: { user: { id: user.id } },
-      skip: Number(page - 1) * Number(limit),
+      skip: (page - 1) * limit,
       take: limit,
       order: { date: 'DESC' },
     });

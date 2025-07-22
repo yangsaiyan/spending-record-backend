@@ -35,14 +35,16 @@ export class RecordController {
 
   // API(/record/paginated)
   @Get('paginated')
-  findAllRecordsPaginated(
+  async getPaginated(
+    @Query('page') page: string,
+    @Query('limit') limit: string,
     @Request() req,
-    @Query('page') page: number,
-    @Query('limit') limit: number,
   ) {
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 10;
     return this.recordService.findAllRecordsPaginated(
-      page,
-      limit,
+      pageNum,
+      limitNum,
       req.user.email,
     );
   }
