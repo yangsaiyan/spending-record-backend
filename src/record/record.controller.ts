@@ -25,11 +25,11 @@ export class RecordController {
   // API(/record/create)
   @Post('create')
   createRecord(@Body() createRecordDto: CreateRecordDto, @Request() req) {
-    return this.recordService.createRecord(createRecordDto, req.user as User);
+    return this.recordService.createRecord(createRecordDto, req.user.email);
   }
 
-  // API(/record/all)
-  @Get('all')
+  // API(/record)
+  @Get()
   findAllRecords(@Request() req) {
     return this.recordService.findAllRecords(req.user as User);
   }

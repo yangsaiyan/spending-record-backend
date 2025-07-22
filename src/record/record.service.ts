@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { LessThanOrEqual, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Record } from './record.entity';
@@ -11,9 +11,15 @@ export class RecordService {
   constructor(
     @InjectRepository(Record)
     private readonly recordRepository: Repository<Record>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
-  async createRecord(createRecordDto: CreateRecordDto, user: User) {
+  async createRecord(createRecordDto: CreateRecordDto, email: string) {
+    const user = await this.userRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     const record = this.recordRepository.create({
       ...createRecordDto,
       user: user,
