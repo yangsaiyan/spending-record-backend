@@ -32,7 +32,7 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.recordRepository.find({ where: { user: user } });
+    return this.recordRepository.find({ where: { user: { id: user.id } } });
   }
 
   async findAllRecordsPaginated(page: number, limit: number, email: string) {
@@ -215,7 +215,11 @@ export class RecordService {
     });
   }
 
-  async updateRecord(updateRecordDto: UpdateRecordDto, id: string, email: string) {
+  async updateRecord(
+    updateRecordDto: UpdateRecordDto,
+    id: string,
+    email: string,
+  ) {
     const user = await this.userRepository.findOne({ where: { email } });
     if (!user) {
       throw new NotFoundException('User not found');
