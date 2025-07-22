@@ -28,8 +28,8 @@ export class RecordController {
     return this.recordService.createRecord(createRecordDto, req.user.email);
   }
 
-  // API(/record)
-  @Get()
+  // API(/record/getAll)
+  @Get('getAll')
   findAllRecords(@Request() req) {
     return this.recordService.findAllRecords(req.user as User);
   }
