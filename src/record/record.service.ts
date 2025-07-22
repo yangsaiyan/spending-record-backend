@@ -41,7 +41,7 @@ export class RecordService {
       throw new NotFoundException('User not found');
     }
     const [records, total] = await this.recordRepository.findAndCount({
-      where: { user: user },
+      where: { user: { id: user.id } },
       skip: (page - 1) * limit,
       take: limit,
       order: { date: 'DESC' },
@@ -58,7 +58,7 @@ export class RecordService {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     return this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(sevenDaysAgo) },
+      where: { user: { id: user.id }, date: LessThanOrEqual(sevenDaysAgo) },
     });
   }
 
@@ -70,7 +70,7 @@ export class RecordService {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     return this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(thirtyDaysAgo) },
+      where: { user: { id: user.id }, date: LessThanOrEqual(thirtyDaysAgo) },
     });
   }
 
@@ -82,7 +82,7 @@ export class RecordService {
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     return this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(ninetyDaysAgo) },
+      where: { user: { id: user.id }, date: LessThanOrEqual(ninetyDaysAgo) },
     });
   }
 
@@ -94,7 +94,10 @@ export class RecordService {
     const oneHundredEightyDaysAgo = new Date();
     oneHundredEightyDaysAgo.setDate(oneHundredEightyDaysAgo.getDate() - 180);
     return this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(oneHundredEightyDaysAgo) },
+      where: {
+        user: { id: user.id },
+        date: LessThanOrEqual(oneHundredEightyDaysAgo),
+      },
     });
   }
 
@@ -109,7 +112,7 @@ export class RecordService {
     );
     return this.recordRepository.find({
       where: {
-        user: user,
+        user: { id: user.id },
         date: LessThanOrEqual(threeHundredSixtyFiveDaysAgo),
       },
     });
@@ -123,7 +126,7 @@ export class RecordService {
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     const categories = await this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(sevenDaysAgo) },
+      where: { user: { id: user.id }, date: LessThanOrEqual(sevenDaysAgo) },
     });
     const categoriesTotal = categories.reduce((acc, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
@@ -140,7 +143,7 @@ export class RecordService {
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const categories = await this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(thirtyDaysAgo) },
+      where: { user: { id: user.id }, date: LessThanOrEqual(thirtyDaysAgo) },
     });
     const categoriesTotal = categories.reduce((acc, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
@@ -157,7 +160,7 @@ export class RecordService {
     const ninetyDaysAgo = new Date();
     ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
     const categories = await this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(ninetyDaysAgo) },
+      where: { user: { id: user.id }, date: LessThanOrEqual(ninetyDaysAgo) },
     });
     const categoriesTotal = categories.reduce((acc, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
@@ -174,7 +177,10 @@ export class RecordService {
     const oneHundredEightyDaysAgo = new Date();
     oneHundredEightyDaysAgo.setDate(oneHundredEightyDaysAgo.getDate() - 180);
     const categories = await this.recordRepository.find({
-      where: { user: user, date: LessThanOrEqual(oneHundredEightyDaysAgo) },
+      where: {
+        user: { id: user.id },
+        date: LessThanOrEqual(oneHundredEightyDaysAgo),
+      },
     });
     const categoriesTotal = categories.reduce((acc, curr) => {
       acc[curr.category] = (acc[curr.category] || 0) + curr.amount;
@@ -194,7 +200,7 @@ export class RecordService {
     );
     const categories = await this.recordRepository.find({
       where: {
-        user: user,
+        user: { id: user.id },
         date: LessThanOrEqual(threeHundredSixtyFiveDaysAgo),
       },
     });
@@ -211,7 +217,7 @@ export class RecordService {
       throw new NotFoundException('User not found');
     }
     return this.recordRepository.findOne({
-      where: { description: Like(`%${description}%`), user: user },
+      where: { description: Like(`%${description}%`), user: { id: user.id } },
     });
   }
 
@@ -224,7 +230,10 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.recordRepository.update({ id, user: user }, updateRecordDto);
+    return this.recordRepository.update(
+      { id, user: { id: user.id } },
+      updateRecordDto,
+    );
   }
 
   async deleteRecord(id: string, email: string) {
@@ -232,6 +241,6 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.recordRepository.delete({ id, user: user });
+    return this.recordRepository.delete({ id, user: { id: user.id } });
   }
 }
