@@ -96,4 +96,24 @@ export class RecordController {
   deleteRecord(@Param('id') id: string, @Request() req) {
     return this.recordService.deleteRecord(id, req.user.email);
   }
+
+  // API(/record/getFilteredRecords)
+  @Get('getFilteredRecords')
+  getFilteredRecords(
+    @Request() req,
+    @Param('startDate') startDate: Date,
+    @Param('endDate') endDate: Date,
+    @Param('category') category: number[],
+    @Param('description') description: string,
+  ) {
+    if (!startDate || !endDate || !category || !description) {
+      throw new BadRequestException('Invalid filter');
+    }
+    return this.recordService.getFilteredRecords(req.user.email, {
+      startDate,
+      endDate,
+      category,
+      description,
+    });
+  }
 }

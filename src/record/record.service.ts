@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Like, Repository, Between } from 'typeorm';
+import { Like, Repository, Between, In } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -116,5 +116,28 @@ export class RecordService {
       throw new NotFoundException('User not found');
     }
     return this.recordRepository.delete({ id, user: { id: user.id } });
+  }
+
+  async getFilteredRecords(
+    email: string,
+    filter: {
+      startDate: Date;
+      endDate: Date;
+      category: number[];
+      description: string;
+    },
+  ) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.recordRepository.find({
+      where: {
+        user: { id: user.id },
+        date: Between(filter.startDate, filter.endDate),
+        category: In(filter.category),
+        description: Like(`%${filter.description}%`),
+      },
+    });
   }
 }
