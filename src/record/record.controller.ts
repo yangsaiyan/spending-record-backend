@@ -50,7 +50,10 @@ export class RecordController {
 
   // API(/record/getDaysRecords/:days)
   @Get('getDaysRecords/:days')
-  getDaysRecords(@Request() req, @Param('days') days: number) {
+  async getDaysRecords(@Param('days', ParseIntPipe) days = 7, @Request() req) {
+    if (!Number.isInteger(days) || days <= 0) {
+      throw new BadRequestException('Invalid days');
+    }
     switch (days) {
       case 7:
         return this.recordService.findLast7DaysRecords(req.user.email);
