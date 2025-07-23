@@ -54,49 +54,19 @@ export class RecordController {
     if (!Number.isInteger(days) || days <= 0) {
       throw new BadRequestException('Invalid days');
     }
-    switch (days) {
-      case 7:
-        return this.recordService.findLast7DaysRecords(req.user.email);
-      case 30:
-        return this.recordService.findLast30DaysRecords(req.user.email);
-      case 90:
-        return this.recordService.findLast90DaysRecords(req.user.email);
-      case 180:
-        return this.recordService.findLast180DaysRecords(req.user.email);
-      case 365:
-        return this.recordService.findLast365DaysRecords(req.user.email);
-      default:
-        throw new BadRequestException('Invalid days');
-    }
+    return this.recordService.findDaysRecords(req.user.email, days);
   }
 
   // API(/record/getDaysTotalByCategory/:days)
   @Get('getDaysTotalByCategory/:days')
-  getDaysTotalByCategory(@Request() req, @Param('days') days: number) {
-    switch (days) {
-      case 7:
-        return this.recordService.findAllLast7DaysCategoriesTotal(
-          req.user.email,
-        );
-      case 30:
-        return this.recordService.findAllLast30DaysCategoriesTotal(
-          req.user.email,
-        );
-      case 90:
-        return this.recordService.findAllLast90DaysCategoriesTotal(
-          req.user.email,
-        );
-      case 180:
-        return this.recordService.findAllLast180DaysCategoriesTotal(
-          req.user.email,
-        );
-      case 365:
-        return this.recordService.findAllLast365DaysCategoriesTotal(
-          req.user.email,
-        );
-      default:
-        throw new BadRequestException('Invalid days');
+  getDaysTotalByCategory(
+    @Request() req,
+    @Param('days', ParseIntPipe) days = 7,
+  ) {
+    if (!Number.isInteger(days) || days <= 0) {
+      throw new BadRequestException('Invalid days');
     }
+    return this.recordService.findDaysCategoriesTotal(req.user.email, days);
   }
 
   // API(/record/findRecordByDescription/:description)
