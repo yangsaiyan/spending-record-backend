@@ -98,7 +98,7 @@ export class RecordController {
   }
 
   // API(/record/getFilteredRecords)
-  @Get('getFilteredRecords')
+  @Get('getFilteredRecords/:startDate/:endDate/:category/:description')
   getFilteredRecords(
     @Request() req,
     @Param('startDate') startDate: Date,
