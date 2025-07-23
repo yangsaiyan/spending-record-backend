@@ -1,16 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import {
-  LessThanOrEqual,
-  Like,
-  Repository,
-  MoreThanOrEqual,
-  Between,
-} from 'typeorm';
+import { Like, Repository, Between } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { User } from 'src/user/user.entity';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class RecordService {
@@ -19,6 +14,7 @@ export class RecordService {
     private readonly recordRepository: Repository<Record>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,
   ) {}
 
   async createRecord(createRecordDto: CreateRecordDto, email: string) {
@@ -34,7 +30,7 @@ export class RecordService {
   }
 
   async findAllRecords(email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -42,7 +38,7 @@ export class RecordService {
   }
 
   async findAllRecordsPaginated(page: number, limit: number, email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -57,7 +53,7 @@ export class RecordService {
   }
 
   async findDaysRecords(email: string, days: number) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -71,7 +67,7 @@ export class RecordService {
   }
 
   async findDaysCategoriesTotal(email: string, days: number) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -90,7 +86,7 @@ export class RecordService {
   }
 
   async findRecordByDescription(description: string, email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -104,7 +100,7 @@ export class RecordService {
     id: string,
     email: string,
   ) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -115,7 +111,7 @@ export class RecordService {
   }
 
   async deleteRecord(id: string, email: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
