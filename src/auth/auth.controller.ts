@@ -64,4 +64,17 @@ export class AuthController {
     await this.authService.resetPassword(body.email, body.otp);
     return { message: 'Password reset successfully' };
   }
+
+  // API(/auth/self-reset-password)
+  @Post('self-reset-password')
+  async selfResetPassword(
+    @Body() body: { email: string; oldPassword: string; password: string },
+  ) {
+    await this.authService.selfResetPassword(
+      body.email,
+      body.oldPassword,
+      body.password,
+    );
+    return { message: 'Password reset successfully' };
+  }
 }

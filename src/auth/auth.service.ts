@@ -96,4 +96,21 @@ export class AuthService {
     );
     return { message: 'Password reset successfully' };
   }
+
+  async selfResetPassword(
+    email: string,
+    oldPassword: string,
+    password: string,
+  ) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    if (!(await bcrypt.compare(oldPassword, user.password))) {
+      throw new UnauthorizedException('Incorrect old password');
+    }
+    const hashed = await bcrypt.hash(password, 10);
+    await this.userService.updateUser(user.id, { password: hashed });
+    return { message: 'Password reset successfully' };
+  }
 }
