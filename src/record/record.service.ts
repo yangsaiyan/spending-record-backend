@@ -137,8 +137,16 @@ export class RecordService {
         ? new Date(filterDto.startDate)
         : new Date(new Date().setDate(new Date().getDate() - 365)),
       endDate: filterDto?.endDate
-        ? new Date(filterDto.endDate)
-        : new Date(new Date().setDate(new Date().getDate() + 1)),
+        ? (() => {
+            const end = new Date(filterDto.endDate);
+            end.setHours(23, 59, 59, 999);
+            return end;
+          })()
+        : (() => {
+            const end = new Date();
+            end.setHours(23, 59, 59, 999);
+            return end;
+          })(),
       category: categoryArray,
       description: filterDto?.description ? filterDto.description : '',
     };
