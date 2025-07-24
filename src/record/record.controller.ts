@@ -98,20 +98,22 @@ export class RecordController {
   }
 
   // API(/record/getFilteredRecords)
-  @Get('getFilteredRecords/:startDate/:endDate/:category/:description')
+  @Get('getFilteredRecords')
   getFilteredRecords(
     @Request() req,
-    @Param('startDate') startDate: Date,
-    @Param('endDate') endDate: Date,
-    @Param('category') category: number[],
-    @Param('description') description: string,
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+    @Query('category') category: number[],
+    @Query('description') description: string,
   ) {
     if (!startDate || !endDate || !category || !description) {
       throw new BadRequestException('Invalid filter');
     }
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
     return this.recordService.getFilteredRecords(req.user.email, {
-      startDate,
-      endDate,
+      startDate: startDateObj,
+      endDate: endDateObj,
       category,
       description,
     });
