@@ -6,6 +6,7 @@ import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
+import { RecordFilterDto } from './dto/search-record.dto';
 
 @Injectable()
 export class RecordService {
@@ -118,32 +119,24 @@ export class RecordService {
     return this.recordRepository.delete({ id, user: { id: user.id } });
   }
 
-  async getFilteredRecords(
-    email: string,
-    filter: {
-      startDate: Date;
-      endDate: Date;
-      category: number[];
-      description: string;
-    },
-  ) {
+  async getFilteredRecords(email: string, filterDto: RecordFilterDto) {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    filter = {
-      startDate: filter?.startDate
-        ? new Date(filter.startDate)
+    const filter = {
+      startDate: filterDto?.startDate
+        ? new Date(filterDto.startDate)
         : new Date(new Date().setDate(new Date().getDate() - 365)),
-      endDate: filter?.endDate ? new Date(filter.endDate) : new Date(),
-      category: filter?.category || [],
-      description: filter?.description || '',
+      endDate: filterDto?.endDate ? new Date(filterDto.endDate) : new Date(),
+      category: filterDto?.category || [],
+      description: filterDto?.description || '',
     };
     return this.recordRepository.find({
       where: {
         user: { id: user.id },
         date: Between(filter.startDate, filter.endDate),
-        category: In(filter.category),
+        category: filter.category.length > 0 ? In(filter.category) : undefined,
         description: Like(`%${filter.description}%`),
       },
     });

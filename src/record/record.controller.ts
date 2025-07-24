@@ -16,6 +16,7 @@ import { RecordService } from './record.service';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { UpdateRecordDto } from './dto/update-record.dto';
+import { RecordFilterDto } from './dto/search-record.dto';
 
 @UseGuards(AuthGuard('jwt'))
 @Controller('record')
@@ -101,20 +102,8 @@ export class RecordController {
   @Get('getFilteredRecords')
   getFilteredRecords(
     @Request() req,
-    @Query('startDate') startDate: string,
-    @Query('endDate') endDate: string,
-    @Query('category') category: string,
-    @Query('description') description: string,
+    @Query() filterDto: RecordFilterDto,
   ) {
-    const categories = category?.split(',').map(Number) || [];
-
-    const startDateObj = new Date(startDate);
-    const endDateObj = new Date(endDate);
-    return this.recordService.getFilteredRecords(req.user.email, {
-      startDate: startDateObj,
-      endDate: endDateObj,
-      category: categories,
-      description,
-    });
+    return this.recordService.getFilteredRecords(req.user.email, filterDto);
   }
 }
