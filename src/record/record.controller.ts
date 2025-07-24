@@ -106,11 +106,7 @@ export class RecordController {
     @Query('category') category: string,
     @Query('description') description: string,
   ) {
-    if (!startDate || !endDate || !category || !description) {
-      throw new BadRequestException('Invalid filter');
-    }
-
-    const categories = category?.split(',').map(Number);
+    const categories = category?.split(',').map(Number) || [];
 
     const startDateObj = new Date(startDate);
     const endDateObj = new Date(endDate);
