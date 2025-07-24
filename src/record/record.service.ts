@@ -130,8 +130,9 @@ export class RecordService {
         : new Date(new Date().setDate(new Date().getDate() - 365)),
       endDate: filterDto?.endDate ? new Date(filterDto.endDate) : new Date(),
       category: filterDto?.category ? filterDto.category : [],
-      description: filterDto?.description ? filterDto.description : '',
+      description: filterDto?.description ? filterDto.description : undefined,
     };
+    console.log(filter);
     return this.recordRepository.find({
       where: {
         user: { id: user.id },
