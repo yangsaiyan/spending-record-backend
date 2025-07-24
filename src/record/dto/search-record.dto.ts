@@ -15,7 +15,7 @@ export class RecordFilterDto {
   @IsOptional()
   @IsArray()
   @Type(() => Number)
-  category?: number[];
+  category?: number[] | string;
 
   @IsOptional()
   @IsString()

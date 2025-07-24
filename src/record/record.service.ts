@@ -124,22 +124,38 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    let categoryArray: number[] = [];
+    if (Array.isArray(filterDto.category)) {
+      categoryArray = filterDto.category.map(Number);
+    } else if (typeof filterDto.category === 'string') {
+      categoryArray = filterDto.category.split(',').map(Number);
+    }
+
     const filter = {
       startDate: filterDto?.startDate
         ? new Date(filterDto.startDate)
         : new Date(new Date().setDate(new Date().getDate() - 365)),
-      endDate: filterDto?.endDate ? new Date(filterDto.endDate) : new Date(),
-      category: filterDto?.category ? filterDto.category : [],
-      description: filterDto?.description ? filterDto.description : undefined,
+      endDate: filterDto?.endDate
+        ? new Date(filterDto.endDate)
+        : new Date(new Date().setDate(new Date().getDate() + 1)),
+      category: categoryArray,
+      description: filterDto?.description ? filterDto.description : '',
     };
-    console.log(filter);
-    return this.recordRepository.find({
-      where: {
-        user: { id: user.id },
-        date: Between(filter.startDate, filter.endDate),
-        category: In(filter.category),
-        description: ILike(`%${filter.description}%`),
-      },
-    });
+
+    const where: any = {
+      user: { id: user.id },
+      date: Between(filter.startDate, filter.endDate),
+    };
+    if (filter.category.length > 0) {
+      where.category = In(filter.category);
+    }
+    if (filter.description && filter.description.trim() !== '') {
+      where.description = ILike(`%${filter.description}%`);
+    }
+
+    console.log('Where:', where);
+
+    return this.recordRepository.find({ where });
   }
 }
