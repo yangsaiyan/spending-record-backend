@@ -103,18 +103,21 @@ export class RecordController {
     @Request() req,
     @Query('startDate') startDate: string,
     @Query('endDate') endDate: string,
-    @Query('category') category: number[],
+    @Query('category') category: string,
     @Query('description') description: string,
   ) {
     if (!startDate || !endDate || !category || !description) {
       throw new BadRequestException('Invalid filter');
     }
+
+    const categories = category?.split(',').map(Number);
+
     const startDateObj = new Date(startDate);
     const endDateObj = new Date(endDate);
     return this.recordService.getFilteredRecords(req.user.email, {
       startDate: startDateObj,
       endDate: endDateObj,
-      category,
+      category: categories,
       description,
     });
   }
