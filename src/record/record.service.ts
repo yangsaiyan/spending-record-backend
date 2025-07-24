@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Like, Repository, Between, In } from 'typeorm';
+import { Like, Repository, Between, In, ILike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
@@ -129,15 +129,15 @@ export class RecordService {
         ? new Date(filterDto.startDate)
         : new Date(new Date().setDate(new Date().getDate() - 365)),
       endDate: filterDto?.endDate ? new Date(filterDto.endDate) : new Date(),
-      category: filterDto?.category || [],
-      description: filterDto?.description || '',
+      category: filterDto?.category ? filterDto.category : [],
+      description: filterDto?.description ? filterDto.description : '',
     };
     return this.recordRepository.find({
       where: {
         user: { id: user.id },
         date: Between(filter.startDate, filter.endDate),
-        category: filter.category.length > 0 ? In(filter.category) : undefined,
-        description: Like(`%${filter.description}%`),
+        category: In(filter.category),
+        description: ILike(`%${filter.description}%`),
       },
     });
   }
