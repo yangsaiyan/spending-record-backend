@@ -131,6 +131,14 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    filter = {
+      startDate: filter?.startDate
+        ? new Date(filter.startDate)
+        : new Date(new Date().setDate(new Date().getDate() - 365)),
+      endDate: filter?.endDate ? new Date(filter.endDate) : new Date(),
+      category: filter?.category || [],
+      description: filter?.description || '',
+    };
     return this.recordRepository.find({
       where: {
         user: { id: user.id },
