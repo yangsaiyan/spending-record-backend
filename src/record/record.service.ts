@@ -220,20 +220,20 @@ export class RecordService {
     }
 
     const toBeAddedRecords = await this.checkMonthlyRecords(records);
-    const newRecords = toBeAddedRecords.map((record) => {
-      return this.createRecord(
+    toBeAddedRecords.map(async (record) => {
+      await this.createRecord(
         {
           amount: record.amount,
           category: record.category,
           description: record.description,
-          date: record.date.toISOString(),
+          date: new Date(
+            `${record.date.getFullYear()}-${record.date.getMonth() + 1}-${record.date.getDate()}`,
+          ).toISOString(),
           isMonthly: true,
-          lastTriggeredDate: new Date().toISOString(),
         },
         email,
       );
     });
-    await Promise.all(newRecords);
     await this.removePreviousMonthlyRecords(toBeAddedRecords);
   }
 
