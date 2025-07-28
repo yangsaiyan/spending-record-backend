@@ -221,15 +221,20 @@ export class RecordService {
 
     const toBeAddedRecords = await this.checkMonthlyRecords(records);
     const newRecords = toBeAddedRecords.map((record) => {
-      return this.recordRepository.create({
-        ...record,
-        isMonthly: true,
-        lastTriggeredDate: new Date().toISOString(),
-      });
+      return this.createRecord(
+        {
+          amount: record.amount,
+          category: record.category,
+          description: record.description,
+          date: record.date.toISOString(),
+          isMonthly: true,
+          lastTriggeredDate: new Date().toISOString(),
+        },
+        email,
+      );
     });
-    const savedRecords = await this.recordRepository.save(newRecords);
+    await Promise.all(newRecords);
     await this.removePreviousMonthlyRecords(toBeAddedRecords);
-    return savedRecords;
   }
 
   async removePreviousMonthlyRecords(records: Record[]) {
