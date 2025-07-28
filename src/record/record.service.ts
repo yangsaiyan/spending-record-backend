@@ -162,8 +162,13 @@ export class RecordService {
       where.description = ILike(`%${filter.description}%`);
     }
 
-    console.log('Where:', where);
-
-    return this.recordRepository.find({ where });
+    const [records, total] = await this.recordRepository.findAndCount({
+      where,
+      skip: (filterDto.page || 1 - 1) * (filterDto.limit || 5),
+      take: filterDto.limit || 5,
+      order: { date: 'DESC' },
+    });
+    const totalPages = Math.ceil(total / (filterDto.limit || 5));
+    return { records, total, totalPages };
   }
 }

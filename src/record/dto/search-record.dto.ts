@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsOptional, IsDate, IsArray, IsString } from 'class-validator';
+import { IsOptional, IsDate, IsArray, IsString, IsNumber } from 'class-validator';
 
 export class RecordFilterDto {
   @IsOptional()
@@ -20,4 +20,12 @@ export class RecordFilterDto {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsNumber()
+  limit?: number = 5;
+
+  @IsOptional()
+  @IsNumber()
+  page?: number = 1;
 }
