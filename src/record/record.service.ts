@@ -164,7 +164,7 @@ export class RecordService {
 
     const [records, total] = await this.recordRepository.findAndCount({
       where,
-      skip: (filterDto.page || 1 - 1) * (filterDto.limit || 5),
+      skip: ((filterDto.page || 1) - 1) * (filterDto.limit || 5),
       take: filterDto.limit || 5,
       order: { date: 'DESC' },
     });
