@@ -37,6 +37,6 @@ export class Record {
   @Column({ type: 'boolean', default: false })
   isMonthly: boolean;
 
-  @Column({ type: 'string', nullable: true })
-  lastTriggeredDate: string;
+  @Column({ type: 'timestamptz', nullable: true })
+  lastTriggeredDate: Date;
 }

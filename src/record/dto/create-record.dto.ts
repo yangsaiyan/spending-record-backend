@@ -19,6 +19,6 @@ export class CreateRecordDto {
   isMonthly?: boolean;
 
   @IsOptional()
-  @IsString()
+  @IsDateString()
   lastTriggeredDate?: string;
 }

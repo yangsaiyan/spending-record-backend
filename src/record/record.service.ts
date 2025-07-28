@@ -25,9 +25,7 @@ export class RecordService {
     }
 
     if (createRecordDto.isMonthly) {
-      createRecordDto.lastTriggeredDate = new Date(createRecordDto.date)
-        .toISOString()
-        .split('T')[0];
+      createRecordDto.lastTriggeredDate = new Date(createRecordDto.date).toISOString();
     }
 
     const record = this.recordRepository.create({
