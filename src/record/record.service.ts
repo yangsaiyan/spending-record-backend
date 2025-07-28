@@ -204,18 +204,11 @@ export class RecordService {
     const toBeAddedRecords = records.filter((record) => {
       const recordDate = new Date(record.lastTriggeredDate);
 
-      if (
-        (now.getMonth() === recordDate.getMonth() + 1 &&
-          now.getFullYear() === recordDate.getFullYear() &&
-          now.getDate() >= recordDate.getDate()) ||
-        (now.getMonth() === 1 &&
-          now.getFullYear() > recordDate.getFullYear() &&
-          now.getDate() >= recordDate.getDate())
-      ) {
-        return true;
-      }
+      const monthsDiff =
+        (now.getFullYear() - recordDate.getFullYear()) * 12 +
+        (now.getMonth() - recordDate.getMonth());
 
-      return false;
+      return monthsDiff >= 1 && now.getDate() >= recordDate.getDate();
     });
     return toBeAddedRecords;
   }
