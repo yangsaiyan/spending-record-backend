@@ -243,7 +243,7 @@ export class RecordService {
     records.map((record) => {
       return this.recordRepository.update(record.id, {
         isMonthly: false,
-        lastTriggeredDate: undefined,
+        lastTriggeredDate: new Date().toISOString(),
       });
     });
   }
