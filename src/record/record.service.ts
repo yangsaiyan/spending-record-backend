@@ -25,7 +25,9 @@ export class RecordService {
     }
 
     if (createRecordDto.isMonthly) {
-      createRecordDto.lastTriggeredDate = new Date(createRecordDto.date).toISOString();
+      createRecordDto.lastTriggeredDate = new Date(
+        createRecordDto.date,
+      ).toISOString();
     }
 
     const record = this.recordRepository.create({
@@ -111,6 +113,13 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    if (updateRecordDto.isMonthly && updateRecordDto.date) {
+      updateRecordDto.lastTriggeredDate = new Date(
+        updateRecordDto.date,
+      ).toISOString();
+    }
+
     return this.recordRepository.update(
       { id, user: { id: user.id } },
       updateRecordDto,
