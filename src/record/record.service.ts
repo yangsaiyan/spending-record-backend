@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Like, Repository, Between, In, ILike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Cron } from '@nestjs/schedule';
 import { Record } from './record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
@@ -50,7 +51,7 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    await this.addMonthlyRecords(email);
+
     const [records, total] = await this.recordRepository.findAndCount({
       where: { user: { id: user.id } },
       skip: (page - 1) * limit,
@@ -140,8 +141,6 @@ export class RecordService {
       throw new NotFoundException('User not found');
     }
 
-    await this.addMonthlyRecords(email);
-
     let categoryArray: number[] = [];
     if (Array.isArray(filterDto.category)) {
       categoryArray = filterDto.category.map(Number);
@@ -199,50 +198,50 @@ export class RecordService {
     });
   }
 
-  async checkMonthlyRecords(records: Record[]): Promise<Record[]> {
-    const now = new Date();
-    const toBeAddedRecords = records.filter((record) => {
-      const recordDate = new Date(record.lastTriggeredDate);
-
-      const monthsDiff =
-        (now.getFullYear() - recordDate.getFullYear()) * 12 +
-        (now.getMonth() - recordDate.getMonth());
-
-      return monthsDiff >= 1 && now.getDate() >= recordDate.getDate();
-    });
-    return toBeAddedRecords;
+  @Cron('0 8 * * *')
+  async handleMonthlyCommitments() {
+    const users = await this.userRepository.find();
+    for (const user of users) {
+      const monthlyRecords = await this.getMonthlyRecords(user.email);
+      await this.addMonthlyRecords(monthlyRecords, user.email);
+    }
   }
 
-  async addMonthlyRecords(email: string) {
-    const records = await this.getMonthlyRecords(email);
-    if (records.length === 0) {
-      return;
+  async addMonthlyRecords(monthlyRecords: Record[], email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
 
-    const toBeAddedRecords = await this.checkMonthlyRecords(records);
-    toBeAddedRecords.map(async (record) => {
-      await this.createRecord(
+    const now = new Date();
+
+    const filteredMonthlyRecords = monthlyRecords.filter((record) => {
+      const monthsDiff = now.getMonth() - record.date.getMonth();
+      const yearsDiff = now.getFullYear() - record.date.getFullYear();
+      return monthsDiff >= 1 || (monthsDiff === 0 && yearsDiff > 0);
+    });
+
+    const newRecords = filteredMonthlyRecords.map(async (record) => {
+      return this.createRecord(
         {
           amount: record.amount,
           category: record.category,
           description: record.description,
           date: new Date(
-            `${record.date.getFullYear()}-${record.date.getMonth() + 1}-${record.date.getDate()}`,
+            record.date.getFullYear(),
+            record.date.getMonth() + 1,
+            record.date.getDate(),
           ).toISOString(),
           isMonthly: true,
+          lastTriggeredDate: new Date().toISOString(),
         },
         email,
       );
     });
-    await this.removePreviousMonthlyRecords(toBeAddedRecords);
-  }
-
-  async removePreviousMonthlyRecords(records: Record[]) {
-    records.map((record) => {
-      return this.recordRepository.update(record.id, {
-        isMonthly: false,
-        lastTriggeredDate: new Date().toISOString(),
-      });
+    await Promise.all(newRecords);
+    filteredMonthlyRecords.forEach((record) => {
+      record.isMonthly = false;
     });
+    await this.recordRepository.save(filteredMonthlyRecords);
   }
 }

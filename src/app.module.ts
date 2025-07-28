@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { RecordModule } from './record/record.module';
 import { OtpModule } from './otp/otp.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { OtpModule } from './otp/otp.module';
         rejectUnauthorized: false,
       },
     }),
+    ScheduleModule.forRoot(),
     OtpModule,
   ],
   controllers: [AppController],
