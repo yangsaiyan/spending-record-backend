@@ -82,7 +82,7 @@ export class RecordController {
     );
   }
 
-  // API(/record/:id)
+  // API(/record/update/:id)
   @Put('update/:id')
   updateRecord(
     @Body() updateRecordDto: UpdateRecordDto,
@@ -92,7 +92,7 @@ export class RecordController {
     return this.recordService.updateRecord(updateRecordDto, id, req.user.email);
   }
 
-  // API(/record/:id)
+  // API(/record/delete/:id)
   @Delete('delete/:id')
   deleteRecord(@Param('id') id: string, @Request() req) {
     return this.recordService.deleteRecord(id, req.user.email);

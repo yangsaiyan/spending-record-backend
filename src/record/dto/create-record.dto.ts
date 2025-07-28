@@ -1,4 +1,4 @@
-import { IsNumber, IsString, IsOptional, IsDateString } from 'class-validator';
+import { IsNumber, IsString, IsOptional, IsDateString, IsBoolean } from 'class-validator';
 
 export class CreateRecordDto {
   @IsNumber()
@@ -13,4 +13,12 @@ export class CreateRecordDto {
 
   @IsDateString()
   date: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isMonthly?: boolean;
+
+  @IsOptional()
+  @IsString()
+  lastTriggeredDate?: string;
 }

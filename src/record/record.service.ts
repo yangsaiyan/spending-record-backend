@@ -23,6 +23,13 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    if (createRecordDto.isMonthly) {
+      createRecordDto.lastTriggeredDate = new Date(createRecordDto.date)
+        .toISOString()
+        .split('T')[0];
+    }
+
     const record = this.recordRepository.create({
       ...createRecordDto,
       user: user,
@@ -43,6 +50,7 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    await this.addMonthlyRecords(email);
     const [records, total] = await this.recordRepository.findAndCount({
       where: { user: { id: user.id } },
       skip: (page - 1) * limit,
@@ -125,6 +133,8 @@ export class RecordService {
       throw new NotFoundException('User not found');
     }
 
+    await this.addMonthlyRecords(email);
+
     let categoryArray: number[] = [];
     if (Array.isArray(filterDto.category)) {
       categoryArray = filterDto.category.map(Number);
@@ -170,5 +180,64 @@ export class RecordService {
     });
     const totalPages = Math.ceil(total / (filterDto.limit || 5));
     return { records, total, totalPages };
+  }
+
+  async getMonthlyRecords(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.recordRepository.find({
+      where: { user: { id: user.id }, isMonthly: true },
+    });
+  }
+
+  async checkMonthlyRecords(records: Record[]): Promise<Record[]> {
+    const now = new Date();
+    const toBeAddedRecords = records.filter((record) => {
+      const recordDate = new Date(record.lastTriggeredDate);
+
+      if (
+        (now.getMonth() === recordDate.getMonth() + 1 &&
+          now.getFullYear() === recordDate.getFullYear() &&
+          now.getDate() >= recordDate.getDate()) ||
+        (now.getMonth() === 1 &&
+          now.getFullYear() > recordDate.getFullYear() &&
+          now.getDate() >= recordDate.getDate())
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+    return toBeAddedRecords;
+  }
+
+  async addMonthlyRecords(email: string) {
+    const records = await this.getMonthlyRecords(email);
+    if (records.length === 0) {
+      return;
+    }
+
+    const toBeAddedRecords = await this.checkMonthlyRecords(records);
+    const newRecords = toBeAddedRecords.map((record) => {
+      return this.recordRepository.create({
+        ...record,
+        isMonthly: true,
+        lastTriggeredDate: new Date().toISOString(),
+      });
+    });
+    const savedRecords = await this.recordRepository.save(newRecords);
+    await this.removePreviousMonthlyRecords(toBeAddedRecords);
+    return savedRecords;
+  }
+
+  async removePreviousMonthlyRecords(records: Record[]) {
+    records.map((record) => {
+      return this.recordRepository.update(record.id, {
+        isMonthly: false,
+        lastTriggeredDate: undefined,
+      });
+    });
   }
 }

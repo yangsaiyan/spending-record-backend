@@ -33,4 +33,10 @@ export class Record {
 
   @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updatedAt: Date;
+
+  @Column({ type: 'boolean', default: false })
+  isMonthly: boolean;
+
+  @Column({ type: 'string', nullable: true })
+  lastTriggeredDate: string;
 }
