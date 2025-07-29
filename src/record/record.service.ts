@@ -115,12 +115,6 @@ export class RecordService {
       throw new NotFoundException('User not found');
     }
 
-    if (updateRecordDto.isMonthly && updateRecordDto.date) {
-      updateRecordDto.lastTriggeredDate = new Date(
-        updateRecordDto.date,
-      ).toISOString();
-    }
-
     return this.recordRepository.update(
       { id, user: { id: user.id } },
       updateRecordDto,
@@ -198,7 +192,9 @@ export class RecordService {
     });
   }
 
-  @Cron('0 8 * * *')
+  @Cron('0 11 * * *', {
+    timeZone: 'Asia/Singapore',
+  })
   async handleMonthlyCommitments() {
     const users = await this.userRepository.find();
     for (const user of users) {
