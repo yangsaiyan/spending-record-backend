@@ -282,6 +282,8 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.monthlyRepository.find({ where: { user: { id: user.id } } });
+    return this.monthlyRepository.find({
+      where: { user: { id: user.id }, isActive: true },
+    });
   }
 }
