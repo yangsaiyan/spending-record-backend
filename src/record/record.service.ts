@@ -192,7 +192,7 @@ export class RecordService {
     });
   }
 
-  @Cron('0 11 * * *', {
+  @Cron('0 12 * * *', {
     timeZone: 'Asia/Singapore',
   })
   async handleMonthlyRecords() {
