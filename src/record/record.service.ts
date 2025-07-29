@@ -2,12 +2,13 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Like, Repository, Between, In, ILike } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cron } from '@nestjs/schedule';
-import { Record } from './record.entity';
+import { Record } from './entities/record.entity';
 import { CreateRecordDto } from './dto/create-record.dto';
 import { UpdateRecordDto } from './dto/update-record.dto';
 import { User } from 'src/user/user.entity';
 import { UserService } from 'src/user/user.service';
 import { RecordFilterDto } from './dto/search-record.dto';
+import { Monthly } from './entities/monthly.entity';
 
 @Injectable()
 export class RecordService {
@@ -17,6 +18,8 @@ export class RecordService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly userService: UserService,
+    @InjectRepository(Monthly)
+    private readonly monthlyRepository: Repository<Monthly>,
   ) {}
 
   async createRecord(createRecordDto: CreateRecordDto, email: string) {
@@ -26,9 +29,7 @@ export class RecordService {
     }
 
     if (createRecordDto.isMonthly) {
-      createRecordDto.lastTriggeredDate = new Date(
-        createRecordDto.date,
-      ).toISOString();
+      await this.createMonthlyRecord(createRecordDto, email);
     }
 
     const record = this.recordRepository.create({
@@ -182,58 +183,71 @@ export class RecordService {
     return { records, total, totalPages };
   }
 
-  async getMonthlyRecords(email: string) {
+  async createMonthlyRecord(createRecordDto: CreateRecordDto, email: string) {
     const user = await this.userService.findByEmail(email);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return this.recordRepository.find({
-      where: { user: { id: user.id }, isMonthly: true },
+    const now = new Date();
+    const monthly = this.monthlyRepository.create({
+      amount: createRecordDto.amount,
+      category: createRecordDto.category,
+      description: createRecordDto.description,
+      user: user,
+      isActive: true,
+      lastTriggeredDate: now,
     });
+    return this.monthlyRepository.save(monthly);
   }
 
-  @Cron('10 14 * * *', {
+  @Cron('45 14 * * *', {
     timeZone: 'Asia/Singapore',
   })
-  async handleMonthlyRecords() {
-    const monthlyRecords = await this.recordRepository.find({
-      where: { isMonthly: true },
+  async monthlyRecordScheduler() {
+    const monthlyRecords = await this.monthlyRepository.find({
+      where: { isActive: true },
     });
-    for (const record of monthlyRecords) {
-      await this.addMonthlyRecords(record);
+    for (const monthlyRecord of monthlyRecords) {
+      if (await this.monthlyRecordCheck(monthlyRecord)) {
+        await this.schedulerAddMonthlyRecord(monthlyRecord);
+        await this.monthlyRepository.update(monthlyRecord.id, {
+          lastTriggeredDate: new Date(),
+        });
+      }
     }
   }
 
-  async addMonthlyRecords(monthlyRecord: Record) {
+  async monthlyRecordCheck(monthlyRecord: Monthly) {
     const now = new Date();
-
-    if (!monthlyRecord.isMonthly) return;
-
     const lastTriggeredDate = new Date(monthlyRecord.lastTriggeredDate);
+    const yearDiff = now.getFullYear() - lastTriggeredDate.getFullYear();
+    const monthDiff = now.getMonth() - lastTriggeredDate.getMonth();
+    const totalMonthDiff = yearDiff * 12 + monthDiff;
+    if (totalMonthDiff >= 1) {
+      return true;
+    }
+    return false;
+  }
 
-    const monthsDiff = now.getMonth() - lastTriggeredDate.getMonth();
-    const yearsDiff = now.getFullYear() - lastTriggeredDate.getFullYear();
-
-    if (monthsDiff < 1 && (monthsDiff !== 0 || yearsDiff === 0)) return;
-
-    const newRecord = this.recordRepository.create({
+  async schedulerAddMonthlyRecord(monthlyRecord: Monthly) {
+    const user = await this.userService.findById(monthlyRecord.user.id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const record = this.recordRepository.create({
       amount: monthlyRecord.amount,
       category: monthlyRecord.category,
       description: monthlyRecord.description,
-      date: new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        monthlyRecord.date.getDate(),
-      ).toISOString(),
-      isMonthly: true,
-      lastTriggeredDate: now,
-      user: monthlyRecord.user,
+      user: user,
+      date: new Date(),
+      generatedFrom: monthlyRecord.id,
     });
+    return this.recordRepository.save(record);
+  }
 
-    await this.recordRepository.save(newRecord);
-
-    monthlyRecord.lastTriggeredDate = now;
-    monthlyRecord.isMonthly = false;
-    await this.recordRepository.save(monthlyRecord);
+  async deactivateMonthlyRecord(id: string) {
+    return this.monthlyRepository.update(id, {
+      isActive: false,
+    });
   }
 }

@@ -100,10 +100,13 @@ export class RecordController {
 
   // API(/record/getFilteredRecords)
   @Get('getFilteredRecords')
-  getFilteredRecords(
-    @Request() req,
-    @Query() filterDto: RecordFilterDto,
-  ) {
+  getFilteredRecords(@Request() req, @Query() filterDto: RecordFilterDto) {
     return this.recordService.getFilteredRecords(req.user.email, filterDto);
+  }
+
+  // API(/record/deactivateMonthlyRecord/:id)
+  @Put('deactivateMonthlyRecord/:id')
+  deactivateMonthlyRecord(@Param('id') id: string) {
+    return this.recordService.deactivateMonthlyRecord(id);
   }
 }

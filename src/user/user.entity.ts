@@ -7,7 +7,7 @@ import {
   OneToMany,
   OneToOne,
 } from 'typeorm';
-import { Record } from '../record/record.entity';
+import { Record } from '../record/entities/record.entity';
 import { Otp } from 'src/otp/otp.entity';
 
 @Entity({ name: 'Users' })

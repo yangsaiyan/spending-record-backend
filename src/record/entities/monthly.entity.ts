@@ -5,11 +5,10 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 @Entity()
-export class Record {
+export class Monthly {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -25,18 +24,12 @@ export class Record {
   @Column()
   description: string;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  date: Date;
-
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  updatedAt: Date;
-
-  @Column({ type: 'boolean', default: false })
-  isMonthly: boolean;
-
   @Column({ type: 'timestamptz', nullable: true })
   lastTriggeredDate: Date;
+
+  @Column({ type: 'boolean', default: true })
+  isActive: boolean;
 }
