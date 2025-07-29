@@ -213,7 +213,7 @@ export class RecordService {
     return this.monthlyRepository.save(monthly);
   }
 
-  @Cron('0 16 * * *', {
+  @Cron('04 18 * * *', {
     timeZone: 'Asia/Singapore',
   })
   async monthlyRecordScheduler() {
