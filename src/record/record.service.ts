@@ -213,12 +213,13 @@ export class RecordService {
     return this.monthlyRepository.save(monthly);
   }
 
-  @Cron('0 15 * * *', {
+  @Cron('05 15 * * *', {
     timeZone: 'Asia/Singapore',
   })
   async monthlyRecordScheduler() {
     const monthlyRecords = await this.monthlyRepository.find({
       where: { isActive: true },
+      relations: ['user'],
     });
     for (const monthlyRecord of monthlyRecords) {
       if (await this.monthlyRecordCheck(monthlyRecord)) {
