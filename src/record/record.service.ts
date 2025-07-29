@@ -195,7 +195,7 @@ export class RecordService {
   @Cron('0 11 * * *', {
     timeZone: 'Asia/Singapore',
   })
-  async handleMonthlyCommitments() {
+  async handleMonthlyRecords() {
     const monthlyRecords = await this.recordRepository.find({
       where: { isMonthly: true },
     });
@@ -214,17 +214,25 @@ export class RecordService {
     const monthsDiff = now.getMonth() - lastTriggeredDate.getMonth();
     const yearsDiff = now.getFullYear() - lastTriggeredDate.getFullYear();
 
-    if (monthsDiff >= 1 || (monthsDiff === 0 && yearsDiff > 0)) return;
+    if (monthsDiff < 1 && (monthsDiff !== 0 || yearsDiff === 0)) return;
+
     const newRecord = this.recordRepository.create({
-      ...monthlyRecord,
+      amount: monthlyRecord.amount,
+      category: monthlyRecord.category,
+      description: monthlyRecord.description,
       date: new Date(
         now.getFullYear(),
         now.getMonth(),
-        now.getDate(),
+        monthlyRecord.date.getDate(),
       ).toISOString(),
-      lastTriggeredDate: now.toISOString(),
+      isMonthly: true,
+      lastTriggeredDate: now,
+      user: monthlyRecord.user,
     });
+
     await this.recordRepository.save(newRecord);
+
+    monthlyRecord.lastTriggeredDate = now;
     monthlyRecord.isMonthly = false;
     await this.recordRepository.save(monthlyRecord);
   }
