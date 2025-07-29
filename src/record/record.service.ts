@@ -29,14 +29,23 @@ export class RecordService {
     }
 
     if (createRecordDto.isMonthly) {
-      await this.createMonthlyRecord(createRecordDto, email);
+      const monthlyRecord = await this.createMonthlyRecord(
+        createRecordDto,
+        email,
+      );
+      const record = this.recordRepository.create({
+        ...createRecordDto,
+        user: user,
+        generatedFrom: monthlyRecord.id,
+      });
+      return this.recordRepository.save(record);
+    } else {
+      const record = this.recordRepository.create({
+        ...createRecordDto,
+        user: user,
+      });
+      return this.recordRepository.save(record);
     }
-
-    const record = this.recordRepository.create({
-      ...createRecordDto,
-      user: user,
-    });
-    return this.recordRepository.save(record);
   }
 
   async findAllRecords(email: string) {
@@ -195,12 +204,16 @@ export class RecordService {
       description: createRecordDto.description,
       user: user,
       isActive: true,
-      lastTriggeredDate: now,
+      lastTriggeredDate: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      ),
     });
     return this.monthlyRepository.save(monthly);
   }
 
-  @Cron('50 14 * * *', {
+  @Cron('0 15 * * *', {
     timeZone: 'Asia/Singapore',
   })
   async monthlyRecordScheduler() {
@@ -234,12 +247,13 @@ export class RecordService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    const lastTriggeredDate = new Date(monthlyRecord.lastTriggeredDate);
     const record = this.recordRepository.create({
       amount: monthlyRecord.amount,
       category: monthlyRecord.category,
       description: monthlyRecord.description,
       user: user,
-      date: new Date(),
+      date: `${lastTriggeredDate.getFullYear()}-${lastTriggeredDate.getMonth() + 1}-${lastTriggeredDate.getDate()}`,
       generatedFrom: monthlyRecord.id,
     });
     return this.recordRepository.save(record);
