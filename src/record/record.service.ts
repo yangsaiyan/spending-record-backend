@@ -196,48 +196,36 @@ export class RecordService {
     timeZone: 'Asia/Singapore',
   })
   async handleMonthlyCommitments() {
-    const users = await this.userRepository.find();
-    for (const user of users) {
-      const monthlyRecords = await this.getMonthlyRecords(user.email);
-      await this.addMonthlyRecords(monthlyRecords, user.email);
+    const monthlyRecords = await this.recordRepository.find({
+      where: { isMonthly: true },
+    });
+    for (const record of monthlyRecords) {
+      await this.addMonthlyRecords(record);
     }
   }
 
-  async addMonthlyRecords(monthlyRecords: Record[], email: string) {
-    const user = await this.userService.findByEmail(email);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
+  async addMonthlyRecords(monthlyRecord: Record) {
     const now = new Date();
 
-    const filteredMonthlyRecords = monthlyRecords.filter((record) => {
-      const monthsDiff = now.getMonth() - record.date.getMonth();
-      const yearsDiff = now.getFullYear() - record.date.getFullYear();
-      return monthsDiff >= 1 || (monthsDiff === 0 && yearsDiff > 0);
-    });
+    if (!monthlyRecord.isMonthly) return;
 
-    const newRecords = filteredMonthlyRecords.map(async (record) => {
-      return this.createRecord(
-        {
-          amount: record.amount,
-          category: record.category,
-          description: record.description,
-          date: new Date(
-            record.date.getFullYear(),
-            record.date.getMonth() + 1,
-            record.date.getDate(),
-          ).toISOString(),
-          isMonthly: true,
-          lastTriggeredDate: new Date().toISOString(),
-        },
-        email,
-      );
+    const lastTriggeredDate = new Date(monthlyRecord.lastTriggeredDate);
+
+    const monthsDiff = now.getMonth() - lastTriggeredDate.getMonth();
+    const yearsDiff = now.getFullYear() - lastTriggeredDate.getFullYear();
+
+    if (monthsDiff >= 1 || (monthsDiff === 0 && yearsDiff > 0)) return;
+    const newRecord = this.recordRepository.create({
+      ...monthlyRecord,
+      date: new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+      ).toISOString(),
+      lastTriggeredDate: now.toISOString(),
     });
-    await Promise.all(newRecords);
-    filteredMonthlyRecords.forEach((record) => {
-      record.isMonthly = false;
-    });
-    await this.recordRepository.save(filteredMonthlyRecords);
+    await this.recordRepository.save(newRecord);
+    monthlyRecord.isMonthly = false;
+    await this.recordRepository.save(monthlyRecord);
   }
 }
