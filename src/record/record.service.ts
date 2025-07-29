@@ -221,11 +221,16 @@ export class RecordService {
       where: { isActive: true },
       relations: ['user'],
     });
+    const now = new Date();
     for (const monthlyRecord of monthlyRecords) {
       if (await this.monthlyRecordCheck(monthlyRecord)) {
         await this.schedulerAddMonthlyRecord(monthlyRecord);
         await this.monthlyRepository.update(monthlyRecord.id, {
-          lastTriggeredDate: new Date(),
+          lastTriggeredDate: new Date(
+            now.getFullYear(),
+            now.getMonth(),
+            now.getDate(),
+          ),
         });
       }
     }
@@ -264,5 +269,13 @@ export class RecordService {
     return this.monthlyRepository.update(id, {
       isActive: false,
     });
+  }
+
+  async getMonthlyRecords(email: string) {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return this.monthlyRepository.find({ where: { user: { id: user.id } } });
   }
 }

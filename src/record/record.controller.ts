@@ -109,4 +109,10 @@ export class RecordController {
   deactivateMonthlyRecord(@Param('id') id: string) {
     return this.recordService.deactivateMonthlyRecord(id);
   }
+
+  // API(/record/getMonthlyRecords)
+  @Get('getMonthlyRecords')
+  getMonthlyRecords(@Request() req) {
+    return this.recordService.getMonthlyRecords(req.user.email);
+  }
 }
