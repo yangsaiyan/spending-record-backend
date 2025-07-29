@@ -266,9 +266,15 @@ export class RecordService {
   }
 
   async deactivateMonthlyRecord(id: string) {
-    return this.monthlyRepository.update(id, {
-      isActive: false,
+    const monthlyRecord = await this.monthlyRepository.findOne({
+      where: { id },
     });
+    if (!monthlyRecord) {
+      throw new NotFoundException('Monthly record not found');
+    }
+    monthlyRecord.isActive = false;
+    await this.monthlyRepository.save(monthlyRecord);
+    return { message: 'Monthly record deactivated successfully' };
   }
 
   async getMonthlyRecords(email: string) {
