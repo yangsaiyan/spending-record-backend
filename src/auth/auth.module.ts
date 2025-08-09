@@ -14,7 +14,7 @@ import { OtpModule } from 'src/otp/otp.module';
     OtpModule,
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'topSecretKey',
-      signOptions: { expiresIn: '24h' },
+      signOptions: { expiresIn: '30d' },
     }),
   ],
   providers: [AuthService, JwtStrategy],
