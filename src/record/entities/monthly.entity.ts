@@ -15,7 +15,7 @@ export class Monthly {
   @ManyToOne(() => User, (user) => user.records)
   user: User;
 
-  @Column()
+  @Column({ type: 'numeric', precision: 10, scale: 2 })
   amount: number;
 
   @Column()
